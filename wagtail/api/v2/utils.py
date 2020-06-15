@@ -118,6 +118,7 @@ def parse_fields_parameter(fields_str):
         negated = False
         ident = ""
 
+        first_char = False
         while fields_str:
             char = fields_str[0]
 
@@ -155,7 +156,6 @@ def parse_fields_parameter(fields_str):
             else:
                 raise FieldsParameterParseError("unexpected char '%s' at position %d" % (char, get_position(fields_str)))
 
-            first_char = False
             fields_str = fields_str[1:]
 
         return ident, negated, fields_str

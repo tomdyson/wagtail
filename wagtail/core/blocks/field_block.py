@@ -434,7 +434,7 @@ class BaseChoiceBlock(FieldBlock):
             for v1, v2 in local_choices:
                 if isinstance(v2, (list, tuple)):
                     # this is a named group, and v2 is the value list
-                    has_blank_choice = any([value in ('', None) for value, label in v2])
+                    has_blank_choice = any(value in ('', None) for value, label in v2)
                     if has_blank_choice:
                         break
                 else:
@@ -716,14 +716,7 @@ class PageChooserBlock(ChooserBlock):
 
     @cached_property
     def target_models(self):
-        target_models = []
-
-        for target_model in self.page_type:
-            target_models.append(
-                resolve_model_string(target_model)
-            )
-
-        return target_models
+        return [resolve_model_string(target_model) for target_model in self.page_type]
 
     @cached_property
     def widget(self):

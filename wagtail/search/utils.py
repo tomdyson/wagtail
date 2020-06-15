@@ -120,10 +120,7 @@ def parse_query_string(query_string, operator=None, zero_terms=MATCH_NONE):
         is_phrase = not is_phrase
 
     if tokens:
-        if operator == 'or':
-            search_query = OR(tokens)
-        else:
-            search_query = AND(tokens)
+        search_query = OR(tokens) if operator == 'or' else AND(tokens)
     else:
         search_query = zero_terms
 

@@ -155,7 +155,7 @@ def start_import(request):
     else:
         form = ImportForm(supported_extensions)
 
-    if not request.FILES or not form.is_valid():
+    if not (request.FILES and form.is_valid()):
         return render(
             request,
             "wagtailredirects/choose_import_file.html",

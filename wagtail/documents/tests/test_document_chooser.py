@@ -33,9 +33,11 @@ class TestChooser(TestCase, WagtailTestUtils):
         editors_group.permissions.add(access_admin_perm)
 
         # Create a non-superuser editor
-        user_data = dict()
-        user_data[user_model.USERNAME_FIELD] = 'editor@email.com'
-        user_data['password'] = 'password'
+        user_data = {
+            user_model.USERNAME_FIELD: 'editor@email.com',
+            'password': 'password',
+        }
+
         for field in user_model.REQUIRED_FIELDS:
             user_data[field] = field
 

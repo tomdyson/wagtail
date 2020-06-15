@@ -94,11 +94,7 @@ class TableBlock(FieldBlock):
             table_header = value['data'][0] if value.get('data', None) and len(value['data']) > 0 and value.get('first_row_is_table_header', False) else None
             first_col_is_header = value.get('first_col_is_header', False)
 
-            if context is None:
-                new_context = {}
-            else:
-                new_context = dict(context)
-
+            new_context = {} if context is None else dict(context)
             new_context.update({
                 'self': value,
                 self.TEMPLATE_VAR: value,

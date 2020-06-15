@@ -32,8 +32,7 @@ def get_format_cls_by_extension(extension):
 
 
 def get_import_formats():
-    formats = [f for f in DEFAULT_FORMATS if f().can_import()]
-    return formats
+    return [f for f in DEFAULT_FORMATS if f().can_import()]
 
 
 def get_file_storage():

@@ -53,10 +53,9 @@ class SpreadsheetExportMixin:
 
     def to_row_dict(self, item):
         """ Returns an OrderedDict (in the order given by list_export) of the exportable information for a model instance"""
-        row_dict = OrderedDict(
+        return OrderedDict(
             (field, self.multigetattr(item, field)) for field in self.list_export
         )
-        return row_dict
 
     def multigetattr(self, item, multi_attribute):
         """ Gets the value of a dot-pathed sequence of attributes/callables on a model, calling at each stage if possible """

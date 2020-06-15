@@ -244,7 +244,7 @@ class TestExtractPanelDefinitionsFromModelClass(TestCase):
         # A class with a 'panels' property defined should return that list
         result = extract_panel_definitions_from_model_class(EventPageSpeaker)
         self.assertEqual(len(result), 5)
-        self.assertTrue(any([isinstance(panel, ImageChooserPanel) for panel in result]))
+        self.assertTrue(any(isinstance(panel, ImageChooserPanel) for panel in result))
 
     def test_exclude(self):
         panels = extract_panel_definitions_from_model_class(Site, exclude=['hostname'])
@@ -255,16 +255,21 @@ class TestExtractPanelDefinitionsFromModelClass(TestCase):
         # EventPage has no 'panels' definition, so one should be derived from the field list
         panels = extract_panel_definitions_from_model_class(EventPage)
 
-        self.assertTrue(any([
-            isinstance(panel, FieldPanel) and panel.field_name == 'date_from'
-            for panel in panels
-        ]))
+        self.assertTrue(
+            any(
+                isinstance(panel, FieldPanel) and panel.field_name == 'date_from'
+                for panel in panels
+            )
+        )
+
 
         # returned panel types should respect modelfield.get_panel() - used on RichTextField
-        self.assertTrue(any([
-            isinstance(panel, RichTextFieldPanel) and panel.field_name == 'body'
-            for panel in panels
-        ]))
+        self.assertTrue(
+            any(
+                isinstance(panel, RichTextFieldPanel) and panel.field_name == 'body'
+                for panel in panels
+            )
+        )
 
 
 class TestTabbedInterface(TestCase):

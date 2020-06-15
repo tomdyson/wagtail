@@ -261,9 +261,7 @@ class BaseCompositeEditHandler(EditHandler):
         widgets = {}
         for handler_class in self.children:
             widgets.update(handler_class.widget_overrides())
-        widget_overrides = widgets
-
-        return widget_overrides
+        return widgets
 
     def required_fields(self):
         fields = []
@@ -296,12 +294,16 @@ class BaseCompositeEditHandler(EditHandler):
         children = []
         for child in self.children:
             if isinstance(child, FieldPanel):
-                if self.form._meta.exclude:
-                    if child.field_name in self.form._meta.exclude:
-                        continue
-                if self.form._meta.fields:
-                    if child.field_name not in self.form._meta.fields:
-                        continue
+                if (
+                    self.form._meta.exclude
+                    and child.field_name in self.form._meta.exclude
+                ):
+                    continue
+                if (
+                    self.form._meta.fields
+                    and child.field_name not in self.form._meta.fields
+                ):
+                    continue
             children.append(child.bind_to(form=self.form))
         self.children = children
 

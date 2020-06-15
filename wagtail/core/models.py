@@ -1100,7 +1100,7 @@ class Page(AbstractPage, index.Indexed, ClusterableModel, metaclass=PageBase):
         permission to delete this article. Returns true if and only if this page is non-live,
         and it has no live children.
         """
-        return (not self.live) and (not self.get_descendants().filter(live=True).exists())
+        return not (self.live or self.get_descendants().filter(live=True).exists())
 
     def move(self, target, pos=None):
         """
@@ -1235,10 +1235,6 @@ class Page(AbstractPage, index.Indexed, ClusterableModel, metaclass=PageBase):
 
             parental_key_name = child_relation.field.attname
             child_objects = getattr(specific_self, accessor_name, None)
-            # Ignore explicitly excluded fields
-            if accessor_name in exclude_fields:
-                continue
-
             if child_objects:
                 for child_object in child_objects.all():
                     old_pk = child_object.pk
@@ -1955,10 +1951,8 @@ class PagePermissionTester:
         self.page_is_root = page.depth == 1  # Equivalent to page.is_root()
 
         if self.user.is_active and not self.user.is_superuser:
-            self.permissions = set(
-                perm.permission_type for perm in user_perms.permissions
-                if self.page.path.startswith(perm.page.path)
-            )
+            self.permissions = {perm.permission_type for perm in user_perms.permissions
+                        if self.page.path.startswith(perm.page.path)}
 
     def user_has_lock(self):
         return self.page.locked_by_id == self.user.pk
@@ -2006,7 +2000,9 @@ class PagePermissionTester:
             return True
 
         # if the user does not have bulk_delete permission, they may only delete leaf pages
-        if 'bulk_delete' not in self.permissions and not self.page.is_leaf() and not ignore_bulk:
+        if not (
+            'bulk_delete' in self.permissions or self.page.is_leaf() or ignore_bulk
+        ):
             return False
 
         if 'edit' in self.permissions:
@@ -2155,10 +2151,7 @@ class PagePermissionTester:
             return False
 
         # we always need at least add permission in the target
-        if 'add' not in destination_perms.permissions:
-            return False
-
-        return True
+        return 'add' in destination_perms.permissions
 
     def can_view_revisions(self):
         return not self.page_is_root
@@ -2196,7 +2189,9 @@ class BaseViewRestriction(models.Model):
             if not request.user.is_superuser:
                 current_user_groups = request.user.groups.all()
 
-                if not any(group in current_user_groups for group in self.groups.all()):
+                if all(
+                    group not in current_user_groups for group in self.groups.all()
+                ):
                     return False
 
         return True

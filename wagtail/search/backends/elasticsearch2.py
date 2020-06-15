@@ -154,7 +154,6 @@ class Elasticsearch2Mapping:
                 sub_field_name, sub_field_mapping = nested_mapping.get_field_mapping(sub_field)
                 mapping['properties'][sub_field_name] = sub_field_mapping
 
-            return self.get_field_column_name(field), mapping
         else:
             mapping = {'type': self.type_map.get(field.get_type(self.model), 'string')}
 
@@ -190,7 +189,8 @@ class Elasticsearch2Mapping:
                 for key, value in field.kwargs['es_extra'].items():
                     mapping[key] = value
 
-            return self.get_field_column_name(field), mapping
+
+        return self.get_field_column_name(field), mapping
 
     def get_mapping(self):
         # Make field list
@@ -304,33 +304,31 @@ class Elasticsearch2SearchQueryCompiler(BaseSearchQueryCompiler):
     def _process_lookup(self, field, lookup, value):
         column_name = self.mapping.get_field_column_name(field)
 
-        if lookup == 'exact':
-            if value is None:
-                return {
-                    'missing': {
-                        'field': column_name,
-                    }
+        if (
+            lookup == 'exact'
+            and value is None
+            or lookup != 'exact'
+            and lookup == 'isnull'
+            and value
+        ):
+            return {
+                'missing': {
+                    'field': column_name,
                 }
-            else:
-                return {
-                    'term': {
-                        column_name: value,
-                    }
+            }
+        elif lookup == 'exact':
+            return {
+                'term': {
+                    column_name: value,
                 }
+            }
 
-        if lookup == 'isnull':
-            if value:
-                return {
-                    'missing': {
-                        'field': column_name,
-                    }
+        elif lookup == 'isnull':
+            return {
+                'exists': {
+                    'field': column_name,
                 }
-            else:
-                return {
-                    'exists': {
-                        'field': column_name,
-                    }
-                }
+            }
 
         if lookup in ['startswith', 'prefix']:
             return {
@@ -348,18 +346,6 @@ class Elasticsearch2SearchQueryCompiler(BaseSearchQueryCompiler):
                 }
             }
 
-        if lookup == 'range':
-            lower, upper = value
-
-            return {
-                'range': {
-                    column_name: {
-                        'gte': lower,
-                        'lte': upper,
-                    }
-                }
-            }
-
         if lookup == 'in':
             if isinstance(value, Query):
                 db_alias = self.queryset._db or DEFAULT_DB_ALIAS
@@ -371,6 +357,17 @@ class Elasticsearch2SearchQueryCompiler(BaseSearchQueryCompiler):
             return {
                 'terms': {
                     column_name: value,
+                }
+            }
+        elif lookup == 'range':
+            lower, upper = value
+
+            return {
+                'range': {
+                    column_name: {
+                        'gte': lower,
+                        'lte': upper,
+                    }
                 }
             }
 
@@ -490,7 +487,7 @@ class Elasticsearch2SearchQueryCompiler(BaseSearchQueryCompiler):
         else:
             fields = [self.mapping.all_field_name]
 
-        if len(fields) == 0:
+        if not fields:
             # No fields. Return a query that'll match nothing
             return {
                 'bool': {
@@ -517,10 +514,7 @@ class Elasticsearch2SearchQueryCompiler(BaseSearchQueryCompiler):
                 # Compile a query for each field then combine with disjunction
                 # max (or operator which takes the max score out of each of the
                 # field queries)
-                field_queries = []
-                for field in fields:
-                    field_queries.append(self._compile_query(self.query, field))
-
+                field_queries = [self._compile_query(self.query, field) for field in fields]
                 return {
                     'dis_max': {
                         'queries': field_queries
@@ -716,11 +710,7 @@ class Elasticsearch2SearchResults(BaseSearchResults):
     def _do_search(self):
         PAGE_SIZE = 100
 
-        if self.stop is not None:
-            limit = self.stop - self.start
-        else:
-            limit = None
-
+        limit = self.stop - self.start if self.stop is not None else None
         use_scroll = limit is None or limit > PAGE_SIZE
 
         params = {
@@ -787,8 +777,7 @@ class Elasticsearch2SearchResults(BaseSearchResults):
             hits = self.backend.es.search(**params)['hits']['hits']
 
             # Get results
-            for result in self._get_results_from_hits(hits):
-                yield result
+            yield from self._get_results_from_hits(hits)
 
     def _do_count(self):
         # Get count

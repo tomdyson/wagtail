@@ -46,10 +46,10 @@ class Indexed:
 
     @classmethod
     def get_search_fields(cls):
-        search_fields = {}
+        search_fields = {
+            (type(field), field.field_name): field for field in cls.search_fields
+        }
 
-        for field in cls.search_fields:
-            search_fields[(type(field), field.field_name)] = field
 
         return list(search_fields.values())
 
@@ -108,17 +108,14 @@ class Indexed:
 
     @classmethod
     def _check_search_fields(cls, **kwargs):
-        errors = []
-        for field in cls.get_search_fields():
-            message = "{model}.search_fields contains non-existent field '{name}'"
-            if not cls._has_field(field.field_name):
-                errors.append(
-                    checks.Warning(
-                        message.format(model=cls.__name__, name=field.field_name),
-                        obj=cls,
-                    )
-                )
-        return errors
+        message = "{model}.search_fields contains non-existent field '{name}'"
+        return [
+            checks.Warning(
+                message.format(model=cls.__name__, name=field.field_name), obj=cls,
+            )
+            for field in cls.get_search_fields()
+            if not cls._has_field(field.field_name)
+        ]
 
     search_fields = []
 

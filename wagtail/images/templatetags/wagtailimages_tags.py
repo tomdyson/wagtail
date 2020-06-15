@@ -58,7 +58,7 @@ def image(parser, token):
         # attributes are not valid when using the 'as img' form of the tag
         is_valid = False
 
-    if len(filter_specs) == 0:
+    if not filter_specs:
         # there must always be at least one filter spec provided
         is_valid = False
 

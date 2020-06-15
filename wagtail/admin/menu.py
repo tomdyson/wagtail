@@ -18,10 +18,7 @@ class MenuItem(metaclass=MediaDefiningClass):
         self.name = (name or slugify(str(label)))
         self.order = order
 
-        if attrs:
-            self.attr_string = flatatt(attrs)
-        else:
-            self.attr_string = ""
+        self.attr_string = flatatt(attrs) if attrs else ""
 
     def is_shown(self, request):
         """
@@ -87,9 +84,11 @@ class Menu:
             for fn in hooks.get_hooks(self.construct_hook_name):
                 fn(request, menu_items)
 
-        rendered_menu_items = []
-        for item in sorted(menu_items, key=lambda i: i.order):
-            rendered_menu_items.append(item.render_html(request))
+        rendered_menu_items = [
+            item.render_html(request)
+            for item in sorted(menu_items, key=lambda i: i.order)
+        ]
+
         return mark_safe(''.join(rendered_menu_items))
 
 

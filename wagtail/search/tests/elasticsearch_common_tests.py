@@ -89,7 +89,7 @@ class ElasticsearchCommonSearchBackendTests(BackendTests):
 
         # Even though they both start with "Java", this should not match the "JavaScript" books
         results = self.backend.search("JavaBeans", models.Book)
-        self.assertSetEqual(set(r.title for r in results), set())
+        self.assertSetEqual({r.title for r in results}, set())
 
     def test_search_with_hyphen(self):
         """
@@ -138,9 +138,14 @@ class ElasticsearchCommonSearchBackendTests(BackendTests):
 
     def test_more_than_one_hundred_results(self):
         # Tests that fetching more than 100 results uses the scroll API
-        books = []
-        for i in range(150):
-            books.append(models.Book.objects.create(title="Book {}".format(i), publication_date=date(2017, 10, 21), number_of_pages=i))
+        books = [
+            models.Book.objects.create(
+                title="Book {}".format(i),
+                publication_date=date(2017, 10, 21),
+                number_of_pages=i,
+            )
+            for i in range(150)
+        ]
 
         index = self.backend.get_index_for_model(models.Book)
         index.add_items(models.Book, books)
@@ -150,9 +155,14 @@ class ElasticsearchCommonSearchBackendTests(BackendTests):
         self.assertEqual(len(results), 164)
 
     def test_slice_more_than_one_hundred_results(self):
-        books = []
-        for i in range(150):
-            books.append(models.Book.objects.create(title="Book {}".format(i), publication_date=date(2017, 10, 21), number_of_pages=i))
+        books = [
+            models.Book.objects.create(
+                title="Book {}".format(i),
+                publication_date=date(2017, 10, 21),
+                number_of_pages=i,
+            )
+            for i in range(150)
+        ]
 
         index = self.backend.get_index_for_model(models.Book)
         index.add_items(models.Book, books)
@@ -164,9 +174,14 @@ class ElasticsearchCommonSearchBackendTests(BackendTests):
     def test_slice_to_next_page(self):
         # ES scroll API doesn't support offset. The implementation has an optimisation
         # which will skip the first page if the first result is on the second page
-        books = []
-        for i in range(150):
-            books.append(models.Book.objects.create(title="Book {}".format(i), publication_date=date(2017, 10, 21), number_of_pages=i))
+        books = [
+            models.Book.objects.create(
+                title="Book {}".format(i),
+                publication_date=date(2017, 10, 21),
+                number_of_pages=i,
+            )
+            for i in range(150)
+        ]
 
         index = self.backend.get_index_for_model(models.Book)
         index.add_items(models.Book, books)

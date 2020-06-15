@@ -353,10 +353,7 @@ class PageQuerySet(SearchableQuerySetMixin, TreeQuerySet):
         improved to generate only a single query in a future release).
         """
         clone = self._clone()
-        if defer:
-            clone._iterable_class = DeferredSpecificIterable
-        else:
-            clone._iterable_class = SpecificIterable
+        clone._iterable_class = DeferredSpecificIterable if defer else SpecificIterable
         return clone
 
     def in_site(self, site):

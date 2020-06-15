@@ -103,12 +103,12 @@ class BaseSearchQueryCompiler:
             raise FilterError('Could not apply filter on search results: Subqueries are not allowed.')
 
         elif isinstance(where_node, WhereNode):
-            # Get child filters
-            connector = where_node.connector
             child_filters = [self._get_filters_from_where_node(child) for child in where_node.children]
 
             if not check_only:
                 child_filters = [child_filter for child_filter in child_filters if child_filter]
+                # Get child filters
+                connector = where_node.connector
                 return self._connect_filters(child_filters, connector, where_node.negated)
 
         else:

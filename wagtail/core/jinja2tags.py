@@ -46,11 +46,7 @@ class WagtailCoreExtension(Extension):
 
     def _include_block(self, value, context=None):
         if hasattr(value, 'render_as_block'):
-            if context:
-                new_context = context.get_all()
-            else:
-                new_context = {}
-
+            new_context = context.get_all() if context else {}
             return jinja2.Markup(value.render_as_block(context=new_context))
 
         return jinja2.Markup(value)

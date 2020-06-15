@@ -29,7 +29,7 @@ class BaseSearchHandler:
 
 class DjangoORMSearchHandler(BaseSearchHandler):
     def search_queryset(self, queryset, search_term, **kwargs):
-        if not search_term or not self.search_fields:
+        if not (search_term and self.search_fields):
             return queryset
 
         orm_lookups = ['%s__icontains' % str(search_field)

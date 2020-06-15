@@ -19,12 +19,9 @@ class OEmbedFinder(EmbedFinder):
         self._endpoints = {}
 
         for provider in providers or all_providers:
-            patterns = []
-
             endpoint = provider['endpoint'].replace('{format}', 'json')
 
-            for url in provider['urls']:
-                patterns.append(re.compile(url))
+            patterns = [re.compile(url) for url in provider['urls']]
 
             self._endpoints[endpoint] = patterns
 

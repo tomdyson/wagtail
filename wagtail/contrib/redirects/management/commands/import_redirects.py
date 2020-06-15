@@ -98,11 +98,7 @@ class Command(BaseCommand):
         if not get_format_cls_by_extension(format_):
             raise Exception("Invalid format '{0}'".format(extension))
 
-        if extension in ["xls", "xlsx"]:
-            mode = "rb"
-        else:
-            mode = "r"
-
+        mode = "rb" if extension in ["xls", "xlsx"] else "r"
         with open(src, mode) as fh:
             imported_data = tablib.Dataset().load(fh.read(), format=format_)
 

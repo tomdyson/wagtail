@@ -263,7 +263,7 @@ class OwnershipPermissionPolicy(BaseDjangoAuthPermissionPolicy):
     def user_has_permission(self, user, action):
         if action == 'add':
             return user.has_perm(self._get_permission_name('add'))
-        elif action == 'change' or action == 'delete':
+        elif action in ['change', 'delete']:
             return (
                 # having 'add' permission means that there are *potentially*
                 # some instances they can edit (namely: ones they own),

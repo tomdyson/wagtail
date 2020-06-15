@@ -58,7 +58,9 @@ def can_choose_page(page, permission_proxy, desired_classes, can_choose_root=Tru
     will check if the root page can be selected and if user permissions
     should be checked.
     """
-    if not issubclass(page.specific_class or Page, desired_classes) and not desired_classes == (Page, ):
+    if not issubclass(
+        page.specific_class or Page, desired_classes
+    ) and desired_classes != (Page,):
         return False
     elif not can_choose_root and page.is_root():
         return False

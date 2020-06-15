@@ -47,10 +47,7 @@ def items_for_result(view, result):
             else:
                 if isinstance(f, models.ManyToOneRel):
                     field_val = getattr(result, f.name)
-                    if field_val is None:
-                        result_repr = empty_value_display
-                    else:
-                        result_repr = field_val
+                    result_repr = empty_value_display if field_val is None else field_val
                 else:
                     result_repr = display_for_field(
                         value, f, empty_value_display)

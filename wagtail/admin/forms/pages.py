@@ -109,22 +109,20 @@ class WagtailAdminPageForm(WagtailAdminModelForm):
     def clean(self):
 
         cleaned_data = super().clean()
-        if 'slug' in self.cleaned_data:
-            if not Page._slug_is_available(
-                cleaned_data['slug'], self.parent_page, self.instance
-            ):
-                self.add_error('slug', forms.ValidationError(_("This slug is already in use")))
+        if 'slug' in self.cleaned_data and not Page._slug_is_available(
+            cleaned_data['slug'], self.parent_page, self.instance
+        ):
+            self.add_error('slug', forms.ValidationError(_("This slug is already in use")))
 
         # Check scheduled publishing fields
         go_live_at = cleaned_data.get('go_live_at')
         expire_at = cleaned_data.get('expire_at')
 
         # Go live must be before expire
-        if go_live_at and expire_at:
-            if go_live_at > expire_at:
-                msg = _('Go live date/time must be before expiry date/time')
-                self.add_error('go_live_at', forms.ValidationError(msg))
-                self.add_error('expire_at', forms.ValidationError(msg))
+        if go_live_at and expire_at and go_live_at > expire_at:
+            msg = _('Go live date/time must be before expiry date/time')
+            self.add_error('go_live_at', forms.ValidationError(msg))
+            self.add_error('expire_at', forms.ValidationError(msg))
 
         # Expire at must be in the future
         if expire_at and expire_at < timezone.now():

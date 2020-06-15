@@ -90,18 +90,21 @@ class BaseGroupCollectionMemberPermissionFormSet(forms.BaseFormSet):
 
         self.instance = instance
 
-        initial_data = []
-
-        for collection, collection_permissions in groupby(
-            instance.collection_permissions.filter(
-                permission__in=self.permission_queryset
-            ).select_related('permission__content_type', 'collection').order_by('collection'),
-            lambda cp: cp.collection
-        ):
-            initial_data.append({
+        initial_data = [
+            {
                 'collection': collection,
-                'permissions': [cp.permission for cp in collection_permissions]
-            })
+                'permissions': [cp.permission for cp in collection_permissions],
+            }
+            for collection, collection_permissions in groupby(
+                instance.collection_permissions.filter(
+                    permission__in=self.permission_queryset
+                )
+                .select_related('permission__content_type', 'collection')
+                .order_by('collection'),
+                lambda cp: cp.collection,
+            )
+        ]
+
 
         super().__init__(
             data, files, initial=initial_data, prefix=prefix

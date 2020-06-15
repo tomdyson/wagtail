@@ -31,7 +31,7 @@ class FooStreamBlock(blocks.StreamBlock):
 
     def clean(self, value):
         value = super().clean(value)
-        if not any(block.value == 'foo' for block in value):
+        if all(block.value != 'foo' for block in value):
             raise blocks.StreamBlockValidationError(non_block_errors=ErrorList([self.error]))
         return value
 
@@ -2046,13 +2046,14 @@ class TestListBlock(WagtailTestUtils, SimpleTestCase):
         )
 
     def render_form(self):
+
         class LinkBlock(blocks.StructBlock):
             title = blocks.CharBlock()
             link = blocks.URLBlock()
 
         block = blocks.ListBlock(LinkBlock)
 
-        html = block.render_form([
+        return block.render_form([
             {
                 'title': "Wagtail",
                 'link': 'http://www.wagtail.io',
@@ -2062,8 +2063,6 @@ class TestListBlock(WagtailTestUtils, SimpleTestCase):
                 'link': 'http://www.djangoproject.com',
             },
         ], prefix='links')
-
-        return html
 
     def test_render_form_wrapper_class(self):
         html = self.render_form()
@@ -2214,7 +2213,7 @@ class TestListBlock(WagtailTestUtils, SimpleTestCase):
 
         # check that items are ordered by the 'order' field, not the order they appear in the form
         post_data = {'shoppinglist-count': '3'}
-        for i in range(0, 3):
+        for i in range(3):
             post_data.update({
                 'shoppinglist-%d-deleted' % i: '',
                 'shoppinglist-%d-order' % i: str(2 - i),
@@ -2229,7 +2228,7 @@ class TestListBlock(WagtailTestUtils, SimpleTestCase):
 
         # check that items are ordered by 'order' numerically, not alphabetically
         post_data = {'shoppinglist-count': '12'}
-        for i in range(0, 12):
+        for i in range(12):
             post_data.update({
                 'shoppinglist-%d-deleted' % i: '',
                 'shoppinglist-%d-order' % i: str(i),
@@ -2926,6 +2925,7 @@ class TestStreamBlock(WagtailTestUtils, SimpleTestCase):
         self.assertIn('<script type="text/x-html-template">hello world</script>', block.all_html_declarations())
 
     def test_ordering_in_form_submission_uses_order_field(self):
+
         class ArticleBlock(blocks.StreamBlock):
             heading = blocks.CharBlock()
             paragraph = blocks.CharBlock()
@@ -2934,7 +2934,7 @@ class TestStreamBlock(WagtailTestUtils, SimpleTestCase):
 
         # check that items are ordered by the 'order' field, not the order they appear in the form
         post_data = {'article-count': '3'}
-        for i in range(0, 3):
+        for i in range(3):
             post_data.update({
                 'article-%d-deleted' % i: '',
                 'article-%d-order' % i: str(2 - i),
@@ -2948,6 +2948,7 @@ class TestStreamBlock(WagtailTestUtils, SimpleTestCase):
         self.assertEqual(block_value[2].id, "0000")
 
     def test_ordering_in_form_submission_is_numeric(self):
+
         class ArticleBlock(blocks.StreamBlock):
             heading = blocks.CharBlock()
             paragraph = blocks.CharBlock()
@@ -2956,7 +2957,7 @@ class TestStreamBlock(WagtailTestUtils, SimpleTestCase):
 
         # check that items are ordered by 'order' numerically, not alphabetically
         post_data = {'article-count': '12'}
-        for i in range(0, 12):
+        for i in range(12):
             post_data.update({
                 'article-%d-deleted' % i: '',
                 'article-%d-order' % i: str(i),

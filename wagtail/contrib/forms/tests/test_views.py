@@ -247,7 +247,7 @@ class TestFormsSubmissionsList(TestCase, WagtailTestUtils):
         """
         This makes 100 submissions to test pagination on the forms submissions page
         """
-        for i in range(100):
+        for _ in range(100):
             submission = FormSubmission(
                 page=self.form_page,
                 form_data=json.dumps({

@@ -102,10 +102,7 @@ class TestImageIndexView(TestCase, WagtailTestUtils):
         self.assertIsNone(current_tag)
 
         tags = response.context['popular_tags']
-        self.assertTrue(
-            [tag.name for tag in tags] == ["one", "two"]
-            or [tag.name for tag in tags] == ["two", "one"]
-        )
+        self.assertTrue([tag.name for tag in tags] in [["one", "two"], ["two", "one"]])
 
 
     def test_tag_filtering(self):
@@ -732,7 +729,7 @@ class TestImageChooserView(TestCase, WagtailTestUtils):
             self.assertEqual(response.status_code, 200)
 
     def test_filter_by_tag(self):
-        for i in range(0, 10):
+        for i in range(10):
             image = Image.objects.create(
                 title="Test image %d is even better than the last one" % i,
                 file=get_test_image_file(),
@@ -907,7 +904,7 @@ class TestImageChooserUploadView(TestCase, WagtailTestUtils):
         self.assertFormError(response, 'uploadform', 'file', "This field is required.")
 
     def test_pagination_after_upload_form_error(self):
-        for i in range(0, 20):
+        for i in range(20):
             Image.objects.create(
                 title="Test image %d" % i,
                 file=get_test_image_file(),

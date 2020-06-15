@@ -86,11 +86,7 @@ def any_permission_required(*perms):
     to pass if they have *any* of the permissions in the list
     """
     def test(user):
-        for perm in perms:
-            if user.has_perm(perm):
-                return True
-
-        return False
+        return any(user.has_perm(perm) for perm in perms)
 
     return user_passes_test(test)
 

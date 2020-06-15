@@ -218,12 +218,13 @@ class BaseAPIViewSet(GenericViewSet):
 
         # If first field is '*' start with all fields
         # If first field is '_' start with no fields
-        if fields_config and fields_config[0][0] == '*':
-            fields = set(all_fields)
-            fields_config = fields_config[1:]
-        elif fields_config and fields_config[0][0] == '_':
-            fields = set()
-            fields_config = fields_config[1:]
+        if fields_config:
+            if fields_config[0][0] == '*':
+                fields = set(all_fields)
+                fields_config = fields_config[1:]
+            elif fields_config[0][0] == '_':
+                fields = set()
+                fields_config = fields_config[1:]
 
         mentioned_fields = set()
         sub_fields = {}
@@ -259,10 +260,13 @@ class BaseAPIViewSet(GenericViewSet):
                 child_sub_fields = sub_fields.get(field_name, [])
 
                 # Inline (aka "child") models should display all fields by default
-                if isinstance(getattr(django_field, 'field', None), ParentalKey):
-                    if not child_sub_fields or child_sub_fields[0][0] not in ['*', '_']:
-                        child_sub_fields = list(child_sub_fields)
-                        child_sub_fields.insert(0, ('*', False, None))
+                if isinstance(
+                    getattr(django_field, 'field', None), ParentalKey
+                ) and (
+                    not child_sub_fields or child_sub_fields[0][0] not in ['*', '_']
+                ):
+                    child_sub_fields = list(child_sub_fields)
+                    child_sub_fields.insert(0, ('*', False, None))
 
                 # Get a serializer class for the related object
                 child_model = django_field.related_model
@@ -308,11 +312,7 @@ class BaseAPIViewSet(GenericViewSet):
             fields_config = []
 
         # Allow "detail_only" (eg parent) fields on detail view
-        if self.action == 'listing_view':
-            show_details = False
-        else:
-            show_details = True
-
+        show_details = False if self.action == 'listing_view' else True
         return self._get_serializer_class(self.request.wagtailapi_router, model, fields_config, show_details=show_details)
 
     def get_serializer_context(self):
@@ -343,20 +343,12 @@ class BaseAPIViewSet(GenericViewSet):
 
     @classmethod
     def get_model_listing_urlpath(cls, model, namespace=''):
-        if namespace:
-            url_name = namespace + ':listing'
-        else:
-            url_name = 'listing'
-
+        url_name = namespace + ':listing' if namespace else 'listing'
         return reverse(url_name)
 
     @classmethod
     def get_object_detail_urlpath(cls, model, pk, namespace=''):
-        if namespace:
-            url_name = namespace + ':detail'
-        else:
-            url_name = 'detail'
-
+        url_name = namespace + ':detail' if namespace else 'detail'
         return reverse(url_name, args=(pk, ))
 
 

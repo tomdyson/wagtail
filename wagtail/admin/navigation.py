@@ -32,10 +32,7 @@ def get_explorable_root_page(user):
 
 def get_site_for_user(user):
     root_page = get_explorable_root_page(user)
-    if root_page:
-        root_site = root_page.get_site()
-    else:
-        root_site = None
+    root_site = root_page.get_site() if root_page else None
     real_site_name = None
     if root_site:
         real_site_name = root_site.site_name if root_site.site_name else root_site.hostname

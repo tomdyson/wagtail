@@ -20,10 +20,7 @@ class SearchArea(metaclass=MediaDefiningClass):
         self.name = (name or slugify(str(label)))
         self.order = order
 
-        if attrs:
-            self.attr_string = flatatt(attrs)
-        else:
-            self.attr_string = ""
+        self.attr_string = flatatt(attrs) if attrs else ""
 
     def __lt__(self, other):
         return (self.order, self.label) < (other.order, other.label)

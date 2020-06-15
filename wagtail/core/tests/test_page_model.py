@@ -883,7 +883,10 @@ class TestCopyPage(TestCase):
 
         # Also, check that the child objects in the new revision are given new IDs
         old_speakers_ids = set(christmas_event.speakers.values_list('id', flat=True))
-        new_speakers_ids = set(speaker['pk'] for speaker in new_revision_content['speakers'])
+        new_speakers_ids = {
+            speaker['pk'] for speaker in new_revision_content['speakers']
+        }
+
         self.assertFalse(
             old_speakers_ids.intersection(new_speakers_ids),
             "Child objects in revisions were not given a new primary key"
@@ -1135,10 +1138,12 @@ class TestCopyPage(TestCase):
         self.assertTrue(all(new_tagged_item_ids))
 
         # new tagged_item IDs should differ from old ones
-        self.assertTrue(all([
-            item_id not in old_tagged_item_ids
-            for item_id in new_tagged_item_ids
-        ]))
+        self.assertTrue(
+            all(
+                item_id not in old_tagged_item_ids
+                for item_id in new_tagged_item_ids
+            )
+        )
 
     def test_copy_page_with_m2m_relations(self):
         # create and publish a ManyToManyBlogPage under Events

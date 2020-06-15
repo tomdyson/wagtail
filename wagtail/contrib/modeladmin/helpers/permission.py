@@ -44,10 +44,10 @@ class PermissionHelper:
         Return a boolean to indicate whether `user` has any model-wide
         permissions
         """
-        for perm in self.get_all_model_permissions().values('codename'):
-            if self.user_has_specific_permission(user, perm['codename']):
-                return True
-        return False
+        return any(
+            self.user_has_specific_permission(user, perm['codename'])
+            for perm in self.get_all_model_permissions().values('codename')
+        )
 
     def user_can_list(self, user):
         """

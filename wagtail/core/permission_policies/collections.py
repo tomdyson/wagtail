@@ -224,7 +224,7 @@ class CollectionOwnershipPermissionPolicy(
     def user_has_permission(self, user, action):
         if action == 'add':
             return self._check_perm(user, ['add'])
-        elif action == 'change' or action == 'delete':
+        elif action in ['change', 'delete']:
             # having 'add' permission means that there are *potentially*
             # some instances they can edit (namely: ones they own),
             # which is sufficient for returning True here

@@ -189,9 +189,9 @@ class TestAdminTagWidget(TestCase):
         """Returns a list of the params passed in to initTagField from the supplied HTML"""
         # Eg. ["test_id", "/admin/tag-autocomplete/", {'allowSpaces': True}]
         start = 'initTagField('
-        end = ');'
         items_after_init = html.split(start)[1]
         if items_after_init:
+            end = ');'
             params_raw = items_after_init.split(end)[0]
             if params_raw:
                 # stuff parameter string into an array so that we can unpack it as JSON

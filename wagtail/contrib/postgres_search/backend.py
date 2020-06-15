@@ -121,7 +121,10 @@ class ObjectIndexer:
         texts = []
         for field in self.search_fields:
             for current_field, boost, value in self.prepare_field(self.obj, field):
-                if isinstance(current_field, SearchField) and not current_field.field_name == 'title':
+                if (
+                    isinstance(current_field, SearchField)
+                    and current_field.field_name != 'title'
+                ):
                     texts.append((value, boost))
 
         return self.as_vector(texts)
@@ -256,7 +259,7 @@ class Index:
             index_entries_for_ct.filter(object_id=indexed_id).update(title=title, autocomplete=autocomplete, body=body)
 
         to_be_created = []
-        for object_id in ids_and_data.keys():
+        for object_id in ids_and_data:
             if object_id not in indexed_ids:
                 title, autocomplete, body = ids_and_data[object_id]
                 to_be_created.append(IndexEntry(

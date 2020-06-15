@@ -98,7 +98,7 @@ class ListBlock(Block):
     def value_from_datadict(self, data, files, prefix):
         count = int(data['%s-count' % prefix])
         values_with_indexes = []
-        for i in range(0, count):
+        for i in range(count):
             if data['%s-%d-deleted' % (prefix, i)]:
                 continue
             values_with_indexes.append(

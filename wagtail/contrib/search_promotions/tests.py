@@ -172,7 +172,7 @@ class TestSearchPromotionsIndexView(TestCase, WagtailTestUtils):
         )
 
         popularQuery = Query.get("optimal")
-        for i in range(50):
+        for _ in range(50):
             popularQuery.add_hit()
         SearchPromotion.objects.create(
             query=popularQuery,
@@ -182,7 +182,7 @@ class TestSearchPromotionsIndexView(TestCase, WagtailTestUtils):
         )
 
         popularQuery = Query.get("suboptimal")
-        for i in range(25):
+        for _ in range(25):
             popularQuery.add_hit()
         SearchPromotion.objects.create(
             query=popularQuery,

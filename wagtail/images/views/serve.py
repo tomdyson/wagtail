@@ -51,9 +51,11 @@ class ServeView(View):
 
     @classonlymethod
     def as_view(cls, **initkwargs):
-        if 'action' in initkwargs:
-            if initkwargs['action'] not in ['serve', 'redirect']:
-                raise ImproperlyConfigured("ServeView action must be either 'serve' or 'redirect'")
+        if 'action' in initkwargs and initkwargs['action'] not in [
+            'serve',
+            'redirect',
+        ]:
+            raise ImproperlyConfigured("ServeView action must be either 'serve' or 'redirect'")
 
         return super(ServeView, cls).as_view(**initkwargs)
 

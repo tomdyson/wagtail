@@ -35,7 +35,10 @@ from wagtail.search.utils import parse_query_string
 
 def get_valid_next_url_from_request(request):
     next_url = request.POST.get('next') or request.GET.get('next')
-    if not next_url or not is_safe_url(url=next_url, allowed_hosts={request.get_host()}):
+    if not (
+        next_url
+        and is_safe_url(url=next_url, allowed_hosts={request.get_host()})
+    ):
         return ''
     return next_url
 
@@ -811,10 +814,11 @@ def move_choose_destination(request, page_to_move_id, viewed_page_id=None):
         target.can_choose = page_perms.can_move_to(target)
 
         target.can_descend = (
-            not(target == page_to_move
-                or target.is_child_of(page_to_move))
+            target != page_to_move
+            and not target.is_child_of(page_to_move)
             and target.get_children_count()
         )
+
 
         child_pages.append(target)
 
@@ -993,25 +997,31 @@ def search(request):
     pagination_query_params = QueryDict({}, mutable=True)
     ordering = None
 
-    if 'ordering' in request.GET:
-        if request.GET['ordering'] in ['title', '-title', 'latest_revision_created_at', '-latest_revision_created_at', 'live', '-live']:
-            ordering = request.GET['ordering']
+    if 'ordering' in request.GET and request.GET['ordering'] in [
+        'title',
+        '-title',
+        'latest_revision_created_at',
+        '-latest_revision_created_at',
+        'live',
+        '-live',
+    ]:
+        ordering = request.GET['ordering']
 
-            if ordering == 'title':
-                pages = pages.order_by('title')
-            elif ordering == '-title':
-                pages = pages.order_by('-title')
+        if ordering == '-latest_revision_created_at':
+            pages = pages.order_by('-latest_revision_created_at')
 
-            if ordering == 'latest_revision_created_at':
-                pages = pages.order_by('latest_revision_created_at')
-            elif ordering == '-latest_revision_created_at':
-                pages = pages.order_by('-latest_revision_created_at')
+        elif ordering == '-live':
+            pages = pages.order_by('-live')
 
-            if ordering == 'live':
-                pages = pages.order_by('live')
-            elif ordering == '-live':
-                pages = pages.order_by('-live')
+        elif ordering == '-title':
+            pages = pages.order_by('-title')
 
+        elif ordering == 'latest_revision_created_at':
+            pages = pages.order_by('latest_revision_created_at')
+        elif ordering == 'live':
+            pages = pages.order_by('live')
+        elif ordering == 'title':
+            pages = pages.order_by('title')
     if 'content_type' in request.GET:
         pagination_query_params['content_type'] = request.GET['content_type']
 

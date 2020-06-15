@@ -59,12 +59,12 @@ class TestContextProcessor(TemplateTestCase):
         """ Accessing a setting should only hit the DB once per request instance,
         even if using that request to rendering multiple times"""
         request = self.get_request()
-        get_title = '{{ settings.tests.testsetting.title }}'
-
         # force site query beforehand
         Site.find_for_request(request)
 
         with self.assertNumQueries(1):
+            get_title = '{{ settings.tests.testsetting.title }}'
+
             for i in range(1, 4):
                 with self.subTest(attempt=i):
                     self.assertEqual(
@@ -246,10 +246,10 @@ class TestSettingsJinja(TemplateTestCase):
         Check that {{ settings }} throws an error if it can not find a
         site to work with
         """
-        context = {}
-
-        # Without a request in the context, and without use_default_site, this
-        # should bail with an error
-        template = '{{ settings("tests.testsetting").title}}'
         with self.assertRaises(RuntimeError):
+            context = {}
+
+            # Without a request in the context, and without use_default_site, this
+            # should bail with an error
+            template = '{{ settings("tests.testsetting").title}}'
             self.render(template, context, request_context=False)

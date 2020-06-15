@@ -258,8 +258,8 @@ class TestCreateView(TestCase, WagtailTestUtils):
                             count=1, html=True)
 
     def test_exclude_passed_to_extract_panel_definitions(self):
-        path_to_form_fields_exclude_property = 'wagtail.contrib.modeladmin.options.ModelAdmin.form_fields_exclude'
         with mock.patch('wagtail.contrib.modeladmin.options.extract_panel_definitions_from_model_class') as m:
+            path_to_form_fields_exclude_property = 'wagtail.contrib.modeladmin.options.ModelAdmin.form_fields_exclude'
             with mock.patch(path_to_form_fields_exclude_property, new_callable=mock.PropertyMock) as mock_form_fields_exclude:
                 mock_form_fields_exclude.return_value = ['123']
 
@@ -386,8 +386,8 @@ class TestEditView(TestCase, WagtailTestUtils):
                             count=1, html=True)
 
     def test_exclude_passed_to_extract_panel_definitions(self):
-        path_to_form_fields_exclude_property = 'wagtail.contrib.modeladmin.options.ModelAdmin.form_fields_exclude'
         with mock.patch('wagtail.contrib.modeladmin.options.extract_panel_definitions_from_model_class') as m:
+            path_to_form_fields_exclude_property = 'wagtail.contrib.modeladmin.options.ModelAdmin.form_fields_exclude'
             with mock.patch(path_to_form_fields_exclude_property, new_callable=mock.PropertyMock) as mock_form_fields_exclude:
                 mock_form_fields_exclude.return_value = ['123']
 

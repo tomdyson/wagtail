@@ -62,7 +62,10 @@ class ExplorePageItem(BaseItem):
 
         # Don't render if user doesn't have ability to edit or publish sub-pages on the parent page
         permission_checker = self.parent_page.permissions_for_user(request.user)
-        if not permission_checker.can_edit() and not permission_checker.can_publish_subpage():
+        if not (
+            permission_checker.can_edit()
+            or permission_checker.can_publish_subpage()
+        ):
             return ""
 
         return super().render(request)

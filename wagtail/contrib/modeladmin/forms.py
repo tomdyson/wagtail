@@ -7,9 +7,11 @@ from wagtail.core.models import Page
 
 class PageChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
-        bits = []
-        for ancestor in obj.get_ancestors(inclusive=True).exclude(depth=1):
-            bits.append(ancestor.get_admin_display_title())
+        bits = [
+            ancestor.get_admin_display_title()
+            for ancestor in obj.get_ancestors(inclusive=True).exclude(depth=1)
+        ]
+
         return mark_safe('<span class="icon icon-arrow-right"></span>'.join(bits))
 
 

@@ -551,20 +551,19 @@ class AbstractRendition(models.Model):
     @classmethod
     def check(cls, **kwargs):
         errors = super(AbstractRendition, cls).check(**kwargs)
-        if not cls._meta.abstract:
-            if not any(
-                set(constraint) == set(['image', 'filter_spec', 'focal_point_key'])
-                for constraint in cls._meta.unique_together
-            ):
-                errors.append(
-                    checks.Error(
-                        "Custom rendition model %r has an invalid unique_together setting" % cls,
-                        hint="Custom rendition models must include the constraint "
-                        "('image', 'filter_spec', 'focal_point_key') in their unique_together definition.",
-                        obj=cls,
-                        id='wagtailimages.E001',
-                    )
+        if not cls._meta.abstract and all(
+            set(constraint) != set(['image', 'filter_spec', 'focal_point_key'])
+            for constraint in cls._meta.unique_together
+        ):
+            errors.append(
+                checks.Error(
+                    "Custom rendition model %r has an invalid unique_together setting" % cls,
+                    hint="Custom rendition models must include the constraint "
+                    "('image', 'filter_spec', 'focal_point_key') in their unique_together definition.",
+                    obj=cls,
+                    id='wagtailimages.E001',
                 )
+            )
 
         return errors
 

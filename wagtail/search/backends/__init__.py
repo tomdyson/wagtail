@@ -87,10 +87,7 @@ def _backend_requires_auto_update(backend_name, params):
     # us to test AUTO_UPDATE behaviour against Elasticsearch without having to
     # have AUTO_UPDATE enabed for every test.
     force_auto_update = getattr(settings, '_WAGTAILSEARCH_FORCE_AUTO_UPDATE', [])
-    if backend_name in force_auto_update:
-        return True
-
-    return False
+    return backend_name in force_auto_update
 
 
 def get_search_backends_with_name(with_auto_update=False):

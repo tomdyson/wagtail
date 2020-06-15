@@ -418,7 +418,7 @@ class BackendTests(WagtailTestUtils):
         # Offset the results
         results = results[3:]
 
-        self.assertListEqual(list(r.title for r in results), [
+        self.assertListEqual([r.title for r in results], [
             "The Fellowship of the Ring",
             "The Return of the King",
             "A Game of Thrones",

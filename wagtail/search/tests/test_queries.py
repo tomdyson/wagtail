@@ -26,7 +26,7 @@ class TestHitCounter(TestCase):
 
     def test_10_hits(self):
         # Add 10 hits
-        for i in range(10):
+        for _ in range(10):
             models.Query.get("Hello").add_hit()
 
         # Test
@@ -76,11 +76,11 @@ class TestQueryStringNormalisation(TestCase):
 class TestQueryPopularity(TestCase):
     def test_query_popularity(self):
         # Add 3 hits to unpopular query
-        for i in range(3):
+        for _ in range(3):
             models.Query.get("unpopular query").add_hit()
 
         # Add 10 hits to popular query
-        for i in range(10):
+        for _ in range(10):
             models.Query.get("popular query").add_hit()
 
         # Get most popular queries
@@ -92,7 +92,7 @@ class TestQueryPopularity(TestCase):
         self.assertEqual(popular_queries[1], models.Query.get("unpopular query"))
 
         # Add 5 hits to little popular query
-        for i in range(5):
+        for _ in range(5):
             models.Query.get("little popular query").add_hit()
 
         # Check list again, little popular query should be in the middle
@@ -102,7 +102,7 @@ class TestQueryPopularity(TestCase):
         self.assertEqual(popular_queries[2], models.Query.get("unpopular query"))
 
         # Unpopular query goes viral!
-        for i in range(20):
+        for _ in range(20):
             models.Query.get("unpopular query").add_hit()
 
         # Unpopular query should be most popular now

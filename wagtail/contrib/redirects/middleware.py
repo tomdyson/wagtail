@@ -51,8 +51,8 @@ class RedirectMiddleware(MiddlewareMixin):
                 return response
 
             redirect = get_redirect(request, path_without_query)
-            if redirect is None:
-                return response
+        if redirect is None:
+            return response
 
         if redirect.link is None:
             return response

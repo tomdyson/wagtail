@@ -88,9 +88,7 @@ class ConfirmImportForm(forms.Form):
     def __init__(self, headers, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        choices = []
-        for i, f in enumerate(headers):
-            choices.append([str(i), f])
+        choices = [[str(i), f] for i, f in enumerate(headers)]
         if len(headers) > 1:
             choices.insert(0, ("", "---"))
 

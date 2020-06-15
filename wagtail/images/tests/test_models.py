@@ -141,7 +141,7 @@ class TestImageQuerySet(TestCase):
         self.assertEqual(list(results), [zzz_image, aaa_image])
 
     def test_search_indexing_prefetches_tags(self):
-        for i in range(0, 10):
+        for i in range(10):
             image = Image.objects.create(
                 title="Test image %d" % i,
                 file=get_test_image_file(),

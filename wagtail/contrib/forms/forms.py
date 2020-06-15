@@ -111,12 +111,12 @@ class FormBuilder:
         return formfields
 
     def get_field_options(self, field):
-        options = {}
-        options['label'] = field.label
-        options['help_text'] = field.help_text
-        options['required'] = field.required
-        options['initial'] = field.default_value
-        return options
+        return {
+            'label': field.label,
+            'help_text': field.help_text,
+            'required': field.required,
+            'initial': field.default_value,
+        }
 
     def get_form_class(self):
         return type(str('WagtailForm'), (BaseForm,), self.formfields)

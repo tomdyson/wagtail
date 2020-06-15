@@ -190,8 +190,7 @@ class InstanceSpecificView(WMABaseView):
         super().__init__(model_admin)
         self.instance_pk = unquote(instance_pk)
         self.pk_quoted = quote(self.instance_pk)
-        filter_kwargs = {}
-        filter_kwargs[self.pk_attname] = self.instance_pk
+        filter_kwargs = {self.pk_attname: self.instance_pk}
         object_qs = model_admin.model._default_manager.get_queryset().filter(
             **filter_kwargs)
         self.instance = get_object_or_404(object_qs)
@@ -561,9 +560,11 @@ class IndexView(SpreadsheetExportMixin, WMABaseView):
         if self.select_related is True:
             return qs.select_related()
 
-        if self.select_related is False:
-            if self.has_related_field_in_list_display():
-                return qs.select_related()
+        if (
+            self.select_related is False
+            and self.has_related_field_in_list_display()
+        ):
+            return qs.select_related()
 
         if self.select_related:
             return qs.select_related(*self.select_related)
@@ -627,23 +628,23 @@ class CreateView(ModelFormView):
         return self.permission_helper.user_can_create(user)
 
     def dispatch(self, request, *args, **kwargs):
-        if self.is_pagemodel:
-            user = request.user
-            parents = self.permission_helper.get_valid_parent_pages(user)
-            parent_count = parents.count()
+        if not self.is_pagemodel:
+            return super().dispatch(request, *args, **kwargs)
+        user = request.user
+        parents = self.permission_helper.get_valid_parent_pages(user)
+        parent_count = parents.count()
 
-            # There's only one available parent for this page type for this
-            # user, so we send them along with that as the chosen parent page
-            if parent_count == 1:
-                parent = parents.get()
-                parent_pk = quote(parent.pk)
-                return redirect(self.url_helper.get_action_url(
-                    'add', self.app_label, self.model_name, parent_pk))
+        # There's only one available parent for this page type for this
+        # user, so we send them along with that as the chosen parent page
+        if parent_count == 1:
+            parent = parents.get()
+            parent_pk = quote(parent.pk)
+            return redirect(self.url_helper.get_action_url(
+                'add', self.app_label, self.model_name, parent_pk))
 
-            # The page can be added in multiple places, so redirect to the
-            # choose_parent view so that the parent can be specified
-            return redirect(self.url_helper.get_action_url('choose_parent'))
-        return super().dispatch(request, *args, **kwargs)
+        # The page can be added in multiple places, so redirect to the
+        # choose_parent view so that the parent can be specified
+        return redirect(self.url_helper.get_action_url('choose_parent'))
 
     def get_meta_title(self):
         return _('Create new %s') % self.verbose_name
@@ -902,10 +903,10 @@ class InspectView(InstanceSpecificView):
         Return a list of `label`/`value` dictionaries to represent the
         fiels named by the model_admin class's `get_inspect_view_fields` method
         """
-        fields = []
-        for field_name in self.model_admin.get_inspect_view_fields():
-            fields.append(self.get_dict_for_field(field_name))
-        return fields
+        return [
+            self.get_dict_for_field(field_name)
+            for field_name in self.model_admin.get_inspect_view_fields()
+        ]
 
     def get_context_data(self, **kwargs):
         context = {

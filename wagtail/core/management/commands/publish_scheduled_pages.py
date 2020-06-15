@@ -11,10 +11,7 @@ def revision_date_expired(r):
     if not expiry_str:
         return False
     expire_at = dateparse.parse_datetime(expiry_str)
-    if expire_at < timezone.now():
-        return True
-    else:
-        return False
+    return expire_at < timezone.now()
 
 
 class Command(BaseCommand):

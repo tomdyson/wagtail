@@ -102,9 +102,9 @@ class SearchFilter(BaseFilterBackend):
         This performs a full-text search on the result set
         Eg: ?search=James Joyce
         """
-        search_enabled = getattr(settings, 'WAGTAILAPI_SEARCH_ENABLED', True)
-
         if 'search' in request.GET:
+            search_enabled = getattr(settings, 'WAGTAILAPI_SEARCH_ENABLED', True)
+
             if not search_enabled:
                 raise BadRequestError("search is disabled")
 

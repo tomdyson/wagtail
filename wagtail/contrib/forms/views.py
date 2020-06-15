@@ -41,10 +41,7 @@ class SafePaginateListView(ListView):
         try:
             page_number = int(page_request)
         except ValueError:
-            if page_request == 'last':
-                page_number = paginator.num_pages
-            else:
-                page_number = 0
+            page_number = paginator.num_pages if page_request == 'last' else 0
         try:
             if page_number > paginator.num_pages:
                 page_number = paginator.num_pages  # page out of range, show last page
@@ -185,7 +182,7 @@ class SubmissionsListView(SpreadsheetExportMixin, SafePaginateListView):
     def get_validated_ordering(self):
         """ Return a dict of field names with ordering labels if ordering is valid """
         orderable_fields = self.orderable_fields or ()
-        ordering = dict()
+        ordering = {}
         if self.is_export:
             #  Revert to CSV order_by submit_time ascending for backwards compatibility
             default_ordering = self.ordering_csv or ()
@@ -213,7 +210,7 @@ class SubmissionsListView(SpreadsheetExportMixin, SafePaginateListView):
     def get_filtering(self):
         """ Return filering as a dict for submissions queryset """
         self.select_date_form = SelectDateForm(self.request.GET)
-        result = dict()
+        result = {}
         if self.select_date_form.is_valid():
             date_from = self.select_date_form.cleaned_data.get('date_from')
             date_to = self.select_date_form.cleaned_data.get('date_to')
@@ -243,8 +240,9 @@ class SubmissionsListView(SpreadsheetExportMixin, SafePaginateListView):
 
     def to_row_dict(self, item):
         """ Orders the submission dictionary for spreadsheet writing """
-        row_dict = OrderedDict((field, item.get_data().get(field)) for field in self.list_export)
-        return row_dict
+        return OrderedDict(
+            (field, item.get_data().get(field)) for field in self.list_export
+        )
 
     def get_context_data(self, **kwargs):
         """ Return context for view """

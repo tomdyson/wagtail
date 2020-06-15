@@ -120,11 +120,7 @@ class IncludeBlockNode(template.Node):
             return ''
 
         if hasattr(value, 'render_as_block'):
-            if self.use_parent_context:
-                new_context = context.flatten()
-            else:
-                new_context = {}
-
+            new_context = context.flatten() if self.use_parent_context else {}
             if self.extra_context:
                 for var_name, var_value in self.extra_context.items():
                     new_context[var_name] = var_value.resolve(context)

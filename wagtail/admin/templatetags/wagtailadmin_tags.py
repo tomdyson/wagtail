@@ -91,7 +91,7 @@ def main_nav_js():
 def ellipsistrim(value, max_length):
     if len(value) > max_length:
         truncd_val = value[:max_length]
-        if not len(value) == (max_length + 1) and value[max_length + 1] != " ":
+        if len(value) != max_length + 1 and value[max_length + 1] != " ":
             truncd_val = truncd_val[:truncd_val.rfind(" ")]
         return truncd_val + "…"
     return value
@@ -171,10 +171,11 @@ def test_page_is_public(context, page):
             'page__path', flat=True
         )
 
-    is_private = any([
+    is_private = any(
         page.path.startswith(restricted_path)
         for restricted_path in context['all_page_view_restriction_paths']
-    ])
+    )
+
 
     return not is_private
 
@@ -335,7 +336,7 @@ def table_header_label(
 
     To disable sorting on this column, set sortable=False or leave sort_field unspecified.
     """
-    if not sortable or not sort_field:
+    if not (sortable and sort_field):
         # render label without a sort link
         return label
 

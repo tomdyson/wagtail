@@ -375,7 +375,7 @@ class TestRedirectsIndexView(TestCase, WagtailTestUtils):
             self.assertEqual(response.status_code, 200)
 
     def test_listing_order(self):
-        for i in range(0, 10):
+        for i in range(10):
             models.Redirect.objects.create(old_path="/redirect%d" % i, redirect_link="http://torchbox.com/")
 
         models.Redirect.objects.create(old_path="/aaargh", redirect_link="http://torchbox.com/")

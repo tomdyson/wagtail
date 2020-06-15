@@ -114,7 +114,7 @@ class ModelAdmin(WagtailRegisterable):
         """
         Don't allow initialisation unless self.model is set to a valid model
         """
-        if not self.model or not issubclass(self.model, Model):
+        if not (self.model and issubclass(self.model, Model)):
             raise ImproperlyConfigured(
                 u"The model attribute on your '%s' class must be set, and "
                 "must be a valid Django model." % self.__class__.__name__)
@@ -299,9 +299,7 @@ class ModelAdmin(WagtailRegisterable):
         return self.form_fields_exclude
 
     def get_index_view_extra_css(self):
-        css = ['wagtailmodeladmin/css/index.css']
-        css.extend(self.index_view_extra_css)
-        return css
+        return ['wagtailmodeladmin/css/index.css', *self.index_view_extra_css]
 
     def get_index_view_extra_js(self):
         return self.index_view_extra_js
@@ -327,15 +325,14 @@ class ModelAdmin(WagtailRegisterable):
         'inspect_view_fields_exclude' not being included.
         """
         if not self.inspect_view_fields:
-            found_fields = []
-            for f in self.model._meta.get_fields():
-                if f.name not in self.inspect_view_fields_exclude:
-                    if f.concrete and (
-                        not f.is_relation
-                        or (not f.auto_created and f.related_model)
-                    ):
-                        found_fields.append(f.name)
-            return found_fields
+            return [
+                f.name
+                for f in self.model._meta.get_fields()
+                if f.name not in self.inspect_view_fields_exclude
+                and f.concrete
+                and (not f.is_relation or (not f.auto_created and f.related_model))
+            ]
+
         return self.inspect_view_fields
 
     def index_view(self, request):
@@ -559,8 +556,7 @@ class ModelAdmin(WagtailRegisterable):
 
         @checks.register('panels')
         def modeladmin_model_check(app_configs, **kwargs):
-            errors = check_panels_in_model(self.model, 'modeladmin')
-            return errors
+            return check_panels_in_model(self.model, 'modeladmin')
 
 
 class ModelAdminGroup(WagtailRegisterable):
